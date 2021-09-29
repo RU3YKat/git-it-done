@@ -80,3 +80,4 @@ var displayWarning = function(repo) {
     limitWarningEl.appendChild(linkEl);
 };
 
+getRepoIssues("facebook/react");
