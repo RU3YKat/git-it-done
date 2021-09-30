@@ -1,5 +1,6 @@
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
+var languageButtonsEl = document.querySelector("#language-buttons");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
 
@@ -13,6 +14,7 @@ var formSubmitHandler = function(event) {
     if (username) {
         // if username has a value, pass as argument into getUserRepos function and run
         getUserRepos(username);
+
         // then clear the input field
         repoContainerEl.textContent = "";
         nameInputEl.value = "";
@@ -22,8 +24,20 @@ var formSubmitHandler = function(event) {
     }
 };
 
+var buttonClickHandler = function(event) {
+    var language = event.target.getAttribute("data-language");
+
+    if (language) {
+        getFeaturedRepos(language);
+
+        // clear old content
+        // will always run last bc getFeaturedRepos() is asynchronous 
+        // and will take longer to get reponse from GitHub's API
+        repoContainerEl.textContent = "";
+    }
+};
+
 var getUserRepos = function(user) {
-    
     // format the github api url, adding submitted user value to string
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
 
@@ -35,8 +49,9 @@ var getUserRepos = function(user) {
             // when HTTP request status code is in the 200s, ok property will be true
         if (response.ok) {
             response.json().then(function(data) {
-            displayRepos(data, user);
-        });
+                console.log(data);
+                displayRepos(data, user);
+            });
         // if ok property is false, something is wrong with HTTP request, alert user
         } else {
             alert("Error: GitHub User Not Found.");
@@ -49,6 +64,23 @@ var getUserRepos = function(user) {
             // notice this `.catch()` getting chained onto the end of the `.then()`
             alert("Unable to connect to GitHub");
         });
+};
+
+var getFeaturedRepos = function(language) {
+    // format the github api url
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "is:featured&sort=help-wanted-issues";
+
+    // make a get request to url
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            // json() method's callback function (passing data.items and language parameters)
+            response.json().then(function(data) {
+                displayRepos(data.items, language);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    });
 };
 
 var displayRepos = function(repos, searchTerm) {
@@ -108,3 +140,6 @@ var displayRepos = function(repos, searchTerm) {
 // when submit ("Get User") button is clicked, run formSubmitHandler()
 userFormEl.addEventListener("submit", formSubmitHandler);
 
+// starts here with event listener on search by topic button
+// when click (a topic language button) occurs, run buttonClickHandler()
+languageButtonsEl.addEventListener("click", buttonClickHandler);
