@@ -48,6 +48,7 @@ var displayIssues = function(issues) {
         issueContainerEl.textContent = "This repo has no open issues!";
         return;
     }
+
     // loop over the response data and create an <a> element for each issue
     for (var i = 0; i < issues.length; i++) {
         // create a link element to take users to the issue on GitHub
@@ -89,7 +90,7 @@ var displayWarning = function(repo) {
     // create link element
     var linkEl = document.createElement("a");
     linkEl.textContent = "See More Issues on GitHub.com";
-    linkEl.setAttribute("href", "https://github.com/" +repo + "/issues");
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
     linkEl.setAttribute("target", "_blank");
 
     // append to warning container
@@ -97,4 +98,3 @@ var displayWarning = function(repo) {
 };
 
 getRepoName();
-getRepoIssues();
